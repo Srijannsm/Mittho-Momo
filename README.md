@@ -4,7 +4,7 @@ A zero-cost, zero-backend ordering page for a home kitchen selling fresh Himalay
 
 **Live:** https://mittho-momo.pages.dev
 
-![Screenshot](images/screenshot.png)
+![Screenshot](images/main-screenshot.png)
 
 ---
 
