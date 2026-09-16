@@ -22,7 +22,7 @@ function renderMenu() {
 
     grouped[category].forEach(function (item) {
       const piecesLine = item.category === 'momo'
-        ? `<p class="pieces">${item.pieces} pcs + ${item.freePieces} free</p>`
+        ? `<p class="pieces">${item.pieces} pcs</p>`
         : '';
 
       html += `
@@ -167,7 +167,7 @@ function buildMessage() {
     if (qty > 0) {
       const lineTotal = item.price * qty;
       total = total + lineTotal;
-      const pieceInfo = item.category === 'momo' ? ` (${item.pieces}+${item.freePieces} pcs)` : '';
+      const pieceInfo = item.category === 'momo' ? ` (${item.pieces} pcs)` : '';
       lines += `• ${item.name}${pieceInfo} x${qty} = Rs ${lineTotal}\n`;
     }
   });
