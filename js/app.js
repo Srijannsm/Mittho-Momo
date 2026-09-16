@@ -214,9 +214,18 @@ function getKolkataDayAndHour() {
   return { weekday, hour };
 }
 
+const WEEKDAY_INDEX = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+const WEEKDAY_NAME = { Sun: 'Sunday', Mon: 'Monday', Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday', Fri: 'Friday', Sat: 'Saturday' };
+
+// ponytail: assumes the open mark falls before the close mark in the same Sun-Sat
+// week (true for Thu->Fri). A window that wraps past Saturday into Sunday would
+// need an extra branch: nowMark >= openMark || nowMark < closeMark.
 function isOrderWindowOpen() {
   const { weekday, hour } = getKolkataDayAndHour();
-  return weekday === 'Fri' && hour >= ORDER_OPEN_HOUR && hour < ORDER_CLOSE_HOUR;
+  const nowMark = WEEKDAY_INDEX[weekday] * 24 + hour;
+  const openMark = WEEKDAY_INDEX[ORDER_OPEN_DAY] * 24 + ORDER_OPEN_HOUR;
+  const closeMark = WEEKDAY_INDEX[ORDER_CLOSE_DAY] * 24 + ORDER_CLOSE_HOUR;
+  return nowMark >= openMark && nowMark < closeMark;
 }
 
 function formatHourLabel(hour) {
@@ -230,10 +239,10 @@ function applyOrderWindow() {
   const isOpen = isOrderWindowOpen();
 
   if (isOpen) {
-    banner.textContent = 'Orders open until ' + formatHourLabel(ORDER_CLOSE_HOUR) + ' today.';
+    banner.textContent = 'Orders open until ' + formatHourLabel(ORDER_CLOSE_HOUR) + ' ' + WEEKDAY_NAME[ORDER_CLOSE_DAY] + '.';
     banner.className = 'status-banner open';
   } else {
-    banner.textContent = 'Orders open Friday, ' + formatHourLabel(ORDER_OPEN_HOUR) + ' – ' + formatHourLabel(ORDER_CLOSE_HOUR) + '.';
+    banner.textContent = 'Orders open ' + WEEKDAY_NAME[ORDER_OPEN_DAY] + ', ' + formatHourLabel(ORDER_OPEN_HOUR) + ' – ' + WEEKDAY_NAME[ORDER_CLOSE_DAY] + ', ' + formatHourLabel(ORDER_CLOSE_HOUR) + '.';
     banner.className = 'status-banner closed';
     submitBtn.disabled = true;
   }

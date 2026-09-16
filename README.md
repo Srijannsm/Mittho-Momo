@@ -32,7 +32,7 @@ Customer picks items  →  cart state in browser  →  formatted text
 
 - **Data-driven menu** — items live in a single array; prices and products are never hardcoded in markup
 - **Live cart** with per-item quantity controls and running total
-- **Order window logic** — orders are open every Friday, 12:00 AM–6:00 PM IST, checked against Kolkata time regardless of the visitor's device timezone, with submission disabled outside that window
+- **Order window logic** — orders are open Thursday 10:00 AM through Friday 6:00 PM IST, checked against Kolkata time regardless of the visitor's device timezone, with submission disabled outside that window
 - **Client-side validation** with inline field highlighting
 - **WhatsApp handoff** with correct URL encoding for multi-line messages
 - **Veg / non-veg labelling** following Indian food-marking convention, with separate-preparation disclosure surfaced at the point of choice
@@ -64,7 +64,9 @@ mittho-momo/
 The menu — changed week to week — and the order window hours — changed only if the weekly schedule itself moves — live at the top of `js/menu.js`:
 
 ```js
-const ORDER_OPEN_HOUR = 0;   // 12:00 AM
+const ORDER_OPEN_DAY = 'Thu';
+const ORDER_OPEN_HOUR = 10;  // 10:00 AM
+const ORDER_CLOSE_DAY = 'Fri';
 const ORDER_CLOSE_HOUR = 18; // 6:00 PM
 
 const menu = [
