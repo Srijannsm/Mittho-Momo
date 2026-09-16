@@ -1,23 +1,51 @@
 const menuList = document.getElementById('menu-list');
 
-let menuHTML = '';
+const categoryLabels = {
+  momo: 'Momos',
+  noodles: 'Noodles',
+};
 
-menu.forEach(function (item) {
-    menuHTML += `
+function renderMenu() {
+  const grouped = {};
+  menu.forEach(function (item) {
+    if (!grouped[item.category]) {
+      grouped[item.category] = [];
+    }
+    grouped[item.category].push(item);
+  });
+
+  let html = '';
+
+  Object.keys(grouped).forEach(function (category) {
+    html += `<h3 class="menu-group-title">${categoryLabels[category] || category}</h3>`;
+    html += '<div class="menu-group">';
+
+    grouped[category].forEach(function (item) {
+      const piecesLine = item.category === 'momo'
+        ? `<p class="pieces">${item.pieces} pcs + ${item.freePieces} free</p>`
+        : '';
+
+      html += `
         <article class="menu-card">
-            <h3><span class="dot ${item.isVeg ? 'veg' : 'nonveg'}"></span>${item.name}</h3>
-            <p class="pieces">${item.pieces} pcs + ${item.freePieces} free</p>
-            <p class="price">Rs ${item.price}</p>
-            <div class="qty-controls">
-                <button type="button" class="qty-btn" data-id="${item.id}" data-action="minus">−</button>
-                <span class="qty" id="qty-${item.id}">0</span>
-                <button type="button" class="qty-btn" data-id="${item.id}" data-action="plus">+</button>
-            </div>
+          <h4><span class="dot ${item.isVeg ? 'veg' : 'nonveg'}"></span>${item.name}</h4>
+          ${piecesLine}
+          <p class="price">Rs ${item.price}</p>
+          <div class="qty-controls">
+            <button type="button" class="qty-btn" data-id="${item.id}" data-action="minus">−</button>
+            <span class="qty" id="qty-${item.id}">0</span>
+            <button type="button" class="qty-btn" data-id="${item.id}" data-action="plus">+</button>
+          </div>
         </article>
-    `;
-});
+      `;
+    });
 
-menuList.innerHTML = menuHTML;
+    html += '</div>';
+  });
+
+  menuList.innerHTML = html;
+}
+
+renderMenu();
 
 const cart = {};
 menu.forEach(function (item) {
@@ -123,10 +151,9 @@ submitBtn.addEventListener('click', function () {
     return;
   }
 
-  // valid — message building goes here next
-    const message = buildMessage();
-    const url = 'https://wa.me/+918104234623?text=' + encodeURIComponent(message);
-    window.open(url, '_blank');
+  const message = buildMessage();
+  const url = 'https://wa.me/918104234623?text=' + encodeURIComponent(message);
+  window.open(url, '_blank');
 });
 
 function buildMessage() {
@@ -140,7 +167,8 @@ function buildMessage() {
     if (qty > 0) {
       const lineTotal = item.price * qty;
       total = total + lineTotal;
-      lines += `• ${item.name} (${item.pieces}+${item.freePieces} pcs) x${qty} = Rs ${lineTotal}\n`;
+      const pieceInfo = item.category === 'momo' ? ` (${item.pieces}+${item.freePieces} pcs)` : '';
+      lines += `• ${item.name}${pieceInfo} x${qty} = Rs ${lineTotal}\n`;
     }
   });
 
@@ -171,10 +199,30 @@ function buildMessage() {
   return message;
 }
 
+function getKolkataDayAndHour() {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Kolkata',
+    weekday: 'short',
+    hour: 'numeric',
+    hour12: false,
+  }).formatToParts(new Date());
+
+  const weekday = parts.find(function (p) { return p.type === 'weekday'; }).value;
+  let hour = Number(parts.find(function (p) { return p.type === 'hour'; }).value);
+  if (hour === 24) hour = 0;
+
+  return { weekday, hour };
+}
+
 function isOrderWindowOpen() {
-  const deadline = new Date(ORDER_DEADLINE);
-  const now = new Date();
-  return now < deadline;
+  const { weekday, hour } = getKolkataDayAndHour();
+  return weekday === 'Fri' && hour >= ORDER_OPEN_HOUR && hour < ORDER_CLOSE_HOUR;
+}
+
+function formatHourLabel(hour) {
+  const period = hour < 12 ? 'AM' : 'PM';
+  const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+  return displayHour + ':00 ' + period;
 }
 
 function applyOrderWindow() {
@@ -182,17 +230,10 @@ function applyOrderWindow() {
   const isOpen = isOrderWindowOpen();
 
   if (isOpen) {
-    const deadline = new Date(ORDER_DEADLINE);
-    const readable = deadline.toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata',
-      weekday: 'long',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-    banner.textContent = 'Orders open until ' + readable;
+    banner.textContent = 'Orders open until ' + formatHourLabel(ORDER_CLOSE_HOUR) + ' today.';
     banner.className = 'status-banner open';
   } else {
-    banner.textContent = 'Orders are closed for this week. Check back soon.';
+    banner.textContent = 'Orders open Friday, ' + formatHourLabel(ORDER_OPEN_HOUR) + ' – ' + formatHourLabel(ORDER_CLOSE_HOUR) + '.';
     banner.className = 'status-banner closed';
     submitBtn.disabled = true;
   }

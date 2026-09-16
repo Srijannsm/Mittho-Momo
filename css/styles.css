@@ -8,6 +8,7 @@
   --dark: #1F2E1E;
   --muted: #6F7F6C;
   --maroon: #A8322A;
+  --maroon-dark: #7E1F1A;
   --gold: #B58F3F;
   --green: #3D6B3A;
 
@@ -96,7 +97,7 @@ body {
 }
 
 .status-banner.open {
-  background: rgba(28, 238, 13, 0.384);
+  background: rgba(61, 107, 58, 0.15);
   color: var(--green);
 }
 
@@ -123,19 +124,32 @@ h2 {
 /* ---------- Menu list ---------- */
 
 #menu-list {
-  background: var(--paper);
-  padding: 0 16px;
-  border-top: 2px solid var(--dark);
-  border-bottom: 2px solid var(--dark);
+  background: none;
+  padding: 0;
+  border: none;
+}
+
+.menu-group-title {
+  font-family: "Kalam", cursive;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin: 20px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--gold);
+}
+
+.menu-group-title:first-child {
+  margin-top: 0;
 }
 
 .menu-card {
-  background: none;
-  border: none;
-  border-radius: 0;
-  border-bottom: 1px dashed rgba(46, 31, 20, 0.25);
-  padding: 16px 0;
-  margin: 0;
+  background: var(--paper);
+  border: 1px solid rgba(31, 46, 30, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(31, 46, 30, 0.06);
+  padding: 14px 16px;
+  margin-bottom: 10px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
@@ -145,12 +159,14 @@ h2 {
   align-items: center;
 }
 
-.menu-card:last-child { border-bottom: none; }
+.menu-card:last-child {
+  margin-bottom: 0;
+}
 
-.menu-card h3 {
+.menu-card h4 {
   grid-area: name;
   font-family: "Kalam", cursive;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
   margin: 0;
   display: flex;
@@ -218,6 +234,14 @@ h2 {
 }
 
 /* ---------- Order summary ---------- */
+
+#summary-section {
+  background: var(--paper);
+  border: 1px solid rgba(31, 46, 30, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(31, 46, 30, 0.06);
+  padding: 14px 16px;
+}
 
 .cart-line {
   margin: 0 0 6px;
@@ -315,6 +339,7 @@ footer p { margin: 6px 0; }
   * { transition: none !important; animation: none !important; }
 }
 
+/* ---------- Toast ---------- */
 
 .toast {
   position: fixed;
@@ -377,4 +402,3 @@ footer p { margin: 6px 0; }
   white-space: nowrap;
   border: 0;
 }
-

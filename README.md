@@ -32,7 +32,7 @@ Customer picks items  →  cart state in browser  →  formatted text
 
 - **Data-driven menu** — items live in a single array; prices and products are never hardcoded in markup
 - **Live cart** with per-item quantity controls and running total
-- **Order window logic** — a configurable deadline closes ordering and disables submission after the weekly cutoff, pinned to IST regardless of the visitor's device timezone
+- **Order window logic** — orders are open every Friday, 12:00 AM–6:00 PM IST, checked against Kolkata time regardless of the visitor's device timezone, with submission disabled outside that window
 - **Client-side validation** with inline field highlighting
 - **WhatsApp handoff** with correct URL encoding for multi-line messages
 - **Veg / non-veg labelling** following Indian food-marking convention, with separate-preparation disclosure surfaced at the point of choice
@@ -52,22 +52,23 @@ Hosted on Cloudflare Pages.
 mittho-momo/
 ├── index.html
 ├── css/
-│   └── style.css
+│   └── styles.css
 ├── js/
-│   ├── menu.js      # menu data + order deadline config
+│   ├── menu.js      # menu data + order window config
 │   └── app.js       # rendering, cart, validation, message building
 └── images/
 ```
 
 ## Configuration
 
-The two things the kitchen changes week to week live at the top of `js/menu.js`:
+The menu — changed week to week — and the order window hours — changed only if the weekly schedule itself moves — live at the top of `js/menu.js`:
 
 ```js
-const ORDER_DEADLINE = '2026-09-05T21:00:00+05:30';
+const ORDER_OPEN_HOUR = 0;   // 12:00 AM
+const ORDER_CLOSE_HOUR = 18; // 6:00 PM
 
 const menu = [
-  { id: 'veg', name: 'Veg Momo', price: 120, type: 'veg', isVeg: true, pieces: 8, freePieces: 2 },
+  { id: 'veg', name: 'Veg Momo', price: 120, type: 'veg', isVeg: true, pieces: 8, freePieces: 2, category: 'momo' },
   // ...
 ];
 ```
@@ -78,7 +79,7 @@ Editing a price or adding an item requires no HTML changes — the menu renders 
 
 **No time-slot selection.** An earlier draft let customers choose a delivery window. Removed after thinking through the kitchen's constraints: a solo cook can't serve fifteen orders that all request 7:00 PM. Batching and messaging directly turned out to be better than a feature that quietly overpromised.
 
-**Deadline stored as an ISO string with an explicit `+05:30` offset.** The site is maintained from Nepal and used in India — 15 minutes apart. Pinning the timezone avoids a class of bug that only appears across borders.
+**Order window read from Kolkata time via `Intl.DateTimeFormat`, never the device's local clock.** The site is maintained from Nepal and used in India — 15 minutes apart. Computing the day/hour directly in Asia/Kolkata avoids a class of bug that only appears across borders.
 
 **Cart state as the single source of truth.** Clicks mutate a `cart` object and then trigger a full re-render; nothing reads values back off the DOM. This is the same one-directional pattern React formalises, implemented by hand.
 
