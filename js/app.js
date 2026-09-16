@@ -147,6 +147,11 @@ function validateOrder() {
 const submitBtn = document.getElementById('submit-order');
 
 submitBtn.addEventListener('click', function () {
+  if (!isOrderWindowOpen()) {
+    showToast(closedWindowMessage());
+    return;
+  }
+
   if (!validateOrder()) {
     return;
   }
@@ -234,6 +239,10 @@ function formatHourLabel(hour) {
   return displayHour + ':00 ' + period;
 }
 
+function closedWindowMessage() {
+  return 'Orders open ' + WEEKDAY_NAME[ORDER_OPEN_DAY] + ', ' + formatHourLabel(ORDER_OPEN_HOUR) + ' – ' + WEEKDAY_NAME[ORDER_CLOSE_DAY] + ', ' + formatHourLabel(ORDER_CLOSE_HOUR) + '.';
+}
+
 function applyOrderWindow() {
   const banner = document.getElementById('order-status');
   const isOpen = isOrderWindowOpen();
@@ -242,9 +251,10 @@ function applyOrderWindow() {
     banner.textContent = 'Orders open until ' + formatHourLabel(ORDER_CLOSE_HOUR) + ' ' + WEEKDAY_NAME[ORDER_CLOSE_DAY] + '.';
     banner.className = 'status-banner open';
   } else {
-    banner.textContent = 'Orders open ' + WEEKDAY_NAME[ORDER_OPEN_DAY] + ', ' + formatHourLabel(ORDER_OPEN_HOUR) + ' – ' + WEEKDAY_NAME[ORDER_CLOSE_DAY] + ', ' + formatHourLabel(ORDER_CLOSE_HOUR) + '.';
+    banner.textContent = closedWindowMessage();
     banner.className = 'status-banner closed';
-    submitBtn.disabled = true;
+    submitBtn.classList.add('closed');
+    submitBtn.setAttribute('aria-disabled', 'true');
   }
 }
 

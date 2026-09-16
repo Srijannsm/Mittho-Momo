@@ -315,7 +315,7 @@ textarea { resize: vertical; }
 
 #submit-order:active { background: var(--maroon-dark); }
 
-#submit-order:disabled {
+#submit-order.closed {
   background: var(--muted);
   cursor: not-allowed;
 }
